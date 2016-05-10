@@ -1,0 +1,151 @@
+<head>
+	<style type="text/css">
+		body {
+			font-size: 30px;
+		}
+
+		.container {
+			position: relative;
+		}
+	</style>
+</head>
+<body>
+
+<h1> Test</h1>
+<div class='container'>
+미안해 미안해 하지마 <br />
+내가 초라해지잖아<br />
+빨간 예쁜 입술로<br />
+어서 나를 죽이고 가<br />
+나는 괜찮아<br />
+마지막으로 나를 바라봐줘<br />
+아무렇지 않은 듯 웃어줘<br />
+네가 보고 싶을 때<br />
+기억할 수 있게<br />
+나의 머릿속에 네 얼굴 그릴 수 있게<br />
+널 보낼 수 없는 나의 욕심이<br />
+집착이 되어 널 가뒀고<br />
+혹시 이런 나 땜에 힘들었니<br />
+아무 대답 없는 너<br />
+바보처럼 왜<br />
+너를 지우지 못해<br />
+넌 떠나버렸는데<br />
+<br /><br />
+너의 눈 코 입<br />
+날 만지던 네 손길<br />
+작은 손톱까지 다<br />
+여전히 널 느낄 수 있지만<br />
+꺼진 불꽃처럼<br />
+타들어가버린<br />
+우리 사랑 모두 다<br />
+너무 아프지만 이젠 널<br />
+추억이라 부를게<br />
+<br /><br />
+사랑해 사랑했지만<br />
+내가 부족했었나 봐<br />
+혹시 우연이라도<br />
+한순간만이라도 널<br />
+볼 수 있을까<br />
+하루하루가 불안해져<br />
+네 모든 게 갈수록 희미해져<br />
+사진 속에 너는 왜<br />
+해맑게 웃는데<br />
+우리에게 다가오는 이별을 모른 채<br />
+<br /><br />
+널 보낼 수 없는 나의 욕심이<br />
+집착이 되어 널 가뒀고<br />
+혹시 이런 나 땜에 힘들었니<br />
+아무 대답 없는 너<br />
+바보처럼 왜<br />
+너를 지우지 못해<br />
+넌 떠나버렸는데<br />
+<br /><br />
+너의 눈 코 입<br />
+날 만지던 네 손길<br />
+작은 손톱까지 다<br />
+여전히 널 느낄 수 있지만<br />
+꺼진 불꽃처럼<br />
+타들어가버린<br />
+우리 사랑 모두 다<br />
+너무 아프지만 이젠 널<br />
+추억이라 부를게<br />
+<br /><br />
+나만을 바라보던 너의 까만 눈<br />
+향기로운 숨을 담은 너의 코<br />
+사랑해 사랑해<br />
+내게 속삭이던 그 입술을 난…<br />
+<br /><br />
+너의 눈 코 입<br />
+날 만지던 네 손길<br />
+작은 손톱까지 다<br />
+여전히 널 느낄 수 있지만<br />
+꺼진 불꽃처럼<br />
+타들어가버린<br />
+우리 사랑 모두 다<br />
+너무 아프지만 이젠 널<br />
+추억이라 부를게<br />
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+
+<script>
+
+	$('body').mouseup(function() {
+	    var text = window.getSelection().toString();
+	    if (text != '') {
+	    	onTextSelected();
+	    }
+	});
+
+	var onTextSelected = function() {
+		var selection = window.getSelection(),
+    	range = selection.getRangeAt(0),
+    	rect = range.getBoundingClientRect();
+
+    	var div = document.createElement('div');   // make box
+		div.style.border = '2px solid black';      // with outline
+		div.style.position = 'absolute';              // fixed positioning = easy mode
+		div.style.top = window.scrollY + rect.top + 'px';       // set coordinates
+		div.style.left = window.scrollX + rect.left + 'px';
+		div.style.height = rect.height + 'px'; // and size
+		div.style.width = rect.width + 'px';
+		div.style.background = 'yellow';
+		div.style.fontSize = '16px';
+		document.body.appendChild(div);            // finally append
+
+		translate(selection.toString(), 'ko', 'en', function(result){
+			console.log(result);
+			div.innerHTML = result.pronunciation + '<br>' + result.translation;
+		});
+	}
+
+	var translate = function(phrase, source, target, cb) {
+		var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl=" + target + "&dt=t&dt=rm&rom=0&srcrom=0&q=" + encodeURI(phrase);
+
+		$.ajax({
+			url: url,
+			dataType: 'text',
+			success: function(text){
+				var formattedText = text;
+				formattedText = formattedText.replace(/\[,/g, "[null,");
+				formattedText = formattedText.replace(/,\]/g, ",null]");
+				while(formattedText.indexOf(',,') !== -1) {
+					formattedText = formattedText.replace(/,,/g, ",null,");
+				}
+
+				var rawObject = JSON.parse(formattedText);
+
+				var translation = rawObject[0][0][0];
+				var pronunciation = _.compact(rawObject[0][1])[0];
+
+				cb({
+					pronunciation: pronunciation, 
+					translation: translation
+				});
+			}
+		});
+	}
+ 
+</script>
+</body>
